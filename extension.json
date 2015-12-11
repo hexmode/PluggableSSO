@@ -1,0 +1,29 @@
+{
+	"name": "PluggableSSO",
+	"namemsg": "pluggablesso-extensionname",
+	"version": "0.1",
+	"author": [
+		"[//mwstake.org Mark A. Hershberger]"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:PluggableSSO",
+	"descriptionmsg": "pluggablesso-desc",
+	"type": "variable",
+	"license-name": "GPL-3.0+",
+	"MessagesDirs": {
+		"PluggableSSO": [
+			"i18n"
+		]
+	},
+	"Hooks": {
+		"AuthPluginSetup": [
+		    "PluggableSSO\\Hooks::onAuthPluginSetup"
+		]
+	},
+	"AutoloadClasses": {
+	    "PluggableSSO\\Hooks": "PluggableSSO.hooks.php",
+	    "PluggableSSO\\Auth":  "PluggableSSOAuth.php"
+	},
+	"config": {
+	},
+	"manifest_version": 1
+}
