@@ -7,7 +7,7 @@
 	],
 	"url": "https://www.mediawiki.org/wiki/Extension:PluggableSSO",
 	"descriptionmsg": "pluggablesso-desc",
-	"type": "variable",
+	"type": "authentication",
 	"license-name": "GPL-3.0+",
 	"MessagesDirs": {
 		"PluggableSSO": [
