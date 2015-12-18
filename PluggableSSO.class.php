@@ -30,17 +30,56 @@ class PluggableSSO extends PluggableAuth {
 	 * @param &$username
 	 * @param &$realname
 	 * @param &$email
+	 *
+	 * @SuppressWarnings("CamelCaseVariableName")
+	 * @SuppressWarnings("SuperGlobals")
 	 */
-	public function authenticate( &$id, &$username, &$realname, &$email ) {
-		throw new MWException("blah");
+	public function authenticate(
+		&$identity, &$username, &$realname, &$email
+	) {
+		if ( !isset( $_SERVER['REMOTE_USER'] ) ) {
+			wfDebugLog( __CLASS__, "The webserver should set REMOTE_USER." );
+			return false;
+		}
+		$username = $_SERVER['REMOTE_USER'];
+		$domain = null;
+		if ( isset( $GLOBALS['wgAuthRemoteuserDomain'] ) ) {
+			$domain = $GLOBALS['wgAuthRemoteuserDomain'];
+
+			list( $name, $userDomain ) = explode( '@', $username );
+			if ( $userDomain !== $domain ) {
+				wfDebugLog( __CLASS__, "Username didn't have the " .
+					"right domain" );
+			}
+			$username = $name;
+		}
+
+		$identity = \User::idFromName( "$username" );
+
+		$session_variable = wfWikiID() . "_userid";
+		if (
+			isset( $_SESSION[$session_variable] ) &&
+			$identity != $_SESSION[$session_variable]
+		) {
+			wfDebugLog( __CLASS__, "Username didn't match session" );
+			return false;
+		}
+
+		\Hooks::run( 'PluggableSSORealName', $realname );
+		\Hooks::run( 'PluggableSSOEmail', $email );
+		$_SESSION[$session_variable] = $identity;
+		return true;
 	}
 
 	/**
 	 * @since 1.0
 	 *
 	 * @param User &$user
+	 *
+	 * @SuppressWarnings("UnusedFormalParameter")
 	 */
 	public function deauthenticate( User &$user ) {
-		throw new MWException("oog");
+		wfDebugLog( __CLASS__, "Don't know what to do with this." );
+		return false;
 	}
 }

@@ -33,6 +33,8 @@ class Auth extends \AuthPlugin {
 	 *
 	 * @param $username String: username.
 	 * @return bool
+	 *
+	 * @SuppressWarnings("UnusedFormalParameter")
 	 */
 	public function userExists( $username ) {
 		return true;
