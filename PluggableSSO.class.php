@@ -65,21 +65,30 @@ class PluggableSSO extends PluggableAuth {
 			return false;
 		}
 
-		\Hooks::run( 'PluggableSSORealName', $realname );
-		\Hooks::run( 'PluggableSSOEmail', $email );
+		\Hooks::run( 'PluggableSSORealName', array( $realname ) );
+		\Hooks::run( 'PluggableSSOEmail', array( $email ) );
 		$_SESSION[$session_variable] = $identity;
 		return true;
 	}
 
 	/**
-	 * @since 1.0
-	 *
 	 * @param User &$user
 	 *
 	 * @SuppressWarnings("UnusedFormalParameter")
 	 */
 	public function deauthenticate( User &$user ) {
-		wfDebugLog( __CLASS__, "Don't know what to do with this." );
+		wfDebugLog( __CLASS__, "Don't know what to do with this." .
+			__METHOD__ );
+		return false;
+	}
+
+	/**
+	 *
+	 * @SuppressWarnings("UnusedFormalParameter")
+	 */
+	public function saveExtraAttributes( $identity ) {
+		wfDebugLog( __CLASS__, "Don't know what to do with this: " .
+			__METHOD__ );
 		return false;
 	}
 }

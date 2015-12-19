@@ -16,14 +16,18 @@
 	},
 	"Hooks": {
 		"AuthPluginSetup": [
-		    "PluggableSSO\\Hooks::onAuthPluginSetup"
+			"PluggableSSO\\Hooks::onAuthPluginSetup"
 		]
 	},
 	"AutoloadClasses": {
-	    "PluggableSSO\\Hooks": "PluggableSSO.hooks.php",
-	    "PluggableSSO\\Auth":  "PluggableSSOAuth.php"
+		"PluggableSSO": "PluggableSSO.class.php",
+		"PluggableSSO\\Hooks": "PluggableSSO.hooks.php",
+		"PluggableSSO\\Auth":  "PluggableSSOAuth.php"
 	},
 	"config": {
+		"ExtensionFunctions": [
+			"PluggableSSO\\Hooks::initExtension"
+		]
 	},
 	"manifest_version": 1
 }
