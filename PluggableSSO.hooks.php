@@ -31,7 +31,7 @@ class Hooks {
 	 * @SuppressWarnings("CamelCaseVariableName")
 	 * @SuppressWarnings("SuperGlobals")
 	 */
-	public static function onAuthPluginSetup( $wgAuth ) {
+	public static function onAuthPluginSetup( &$wgAuth ) {
 		\Hooks::run( 'PluggableSSOAuth', array( &$wgAuth ) );
 	}
 
