@@ -83,7 +83,7 @@ class Auth extends \AuthPlugin {
 	 * @return bool
 	 */
 	public function updateUser( &$user ) {
-		Hooks::run( "PluggableSSOInitOrUpdateUser", [ &$user, false ] );
+		\Hooks::run( "PluggableSSOInitOrUpdateUser", [ &$user, false ] );
 	}
 
 	/**
