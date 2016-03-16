@@ -1,2 +1,17 @@
-# PluggableSSO
-SSO plugin for PluggableAuth
+== PluggableSSO ==
+SSO plugin for PluggableAuth.
+
+This extension works with the [https://www.mediawiki.org/wiki/Extension:PluggableAuth PluggableAuth] extension to automatically create users for MediaWiki based on Single-Sign-On provisions.
+
+For example, if you have set up Apache and [http://modauthkerb.sourceforge.net/ mod_kerb], you'll be given REMOTE_USER in your HTTP Headers.  In the past, you would the [https://www.mediawiki.org/wiki/Extension:Auth_remoteuser Auth_remoteuser], extension for this.
+
+This extension is meant to be a drop-in replacement for that.
+
+=== SiteMinder SSO ===
+
+This extension can also replace the [https://www.mediawiki.org/wiki/Extension:Siteminder_Authentication Siteminder Authentication] extension with a couple of lines of code:
+
+``` php
+$wgSSOHeader = "SM-MAIL";
+$wgAuthRemoteuserDomain = "example.com";
+```
