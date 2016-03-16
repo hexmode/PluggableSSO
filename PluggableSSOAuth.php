@@ -24,6 +24,18 @@
 namespace PluggableSSO;
 
 class Auth extends \AuthPlugin {
+	protected $config = null;
+
+	public function getConfig( $name ) {
+		if ( $this->config === null ) {
+			$this->config = GlobalVarConfig::newInstance();
+		}
+		if ( $this->config->has( $name ) ) {
+			return $this->config->get( $name );
+		}
+		return null;
+	}
+
 	/**
 	 * Pretend all users exist.  This is checked by
 	 * authenticateUserData to determine if a user exists in our 'db'.
@@ -62,10 +74,8 @@ class Auth extends \AuthPlugin {
 	 * @return bool
 	 */
 	public function validDomain( $domain ) {
-		if (
-			isset( $GLOBALS['wgAuthRemoteuserDomain'] ) &&
-			$domain !== $GLOBALS['wgAuthRemoteuserDomain']
-		) {
+		$remoteDomain = $this->getConfig( 'AuthRemoteuserDomain' );
+		if ( $domain !== $remoteDomain ) {
 			return false;
 		}
 		return true;

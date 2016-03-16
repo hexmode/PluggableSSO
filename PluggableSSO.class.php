@@ -23,6 +23,34 @@
 
 class PluggableSSO extends PluggableAuth {
 
+	protected $context = null;
+	protected $config = null;
+	protected $request = null;
+	protected $headers = null;
+
+	protected function init() {
+		if ( $this->context === null ) {
+			$this->context = RequestContext::getMain();
+		}
+		if ( $this->config === null ) {
+			$this->config = $this->context->getConfig();
+		}
+		if ( $this->request === null ) {
+			$this->request = $this->config->get( 'Request' );
+		}
+		if ( $this->headers === null ) {
+			$this->headers = $this->request->getAllHeaders();
+		}
+	}
+
+	public function getConfig( $name ) {
+		$this->init();
+		if ( $this->config->has( $name ) ) {
+			return $this->config->get( $name );
+		}
+		return null;
+	}
+
 	/**
 	 * @since 1.0
 	 *
@@ -37,19 +65,20 @@ class PluggableSSO extends PluggableAuth {
 	public function authenticate(
 		&$identity, &$username, &$realname, &$email
 	) {
-		if ( !isset( $_SERVER['REMOTE_USER'] ) ) {
-			wfDebugLog( __CLASS__, "The webserver should set REMOTE_USER." );
+		$this->init();
+		$headerName = $this->config->get( 'SSOHeader' );
+		if ( !isset( $this->headers[ $headerName ] ) ) {
+			wfDebugLog( __CLASS__, "The webserver should set $headerName." );
 			return false;
 		}
-		$username = $_SERVER['REMOTE_USER'];
+		$username = $this->headers[ $headerName ];
 		$domain = null;
-		if ( isset( $GLOBALS['wgAuthRemoteuserDomain'] ) ) {
-			$domain = $GLOBALS['wgAuthRemoteuserDomain'];
-
+		$remoteDomain = $this->getConfig( 'AuthRemoteuserDomain' );
+		if ( $remoteDomain ) {
 			list( $name, $userDomain ) = explode( '@', $username );
-			if ( $userDomain !== $domain ) {
-				wfDebugLog( __CLASS__, "Username didn't have the " .
-					"right domain" );
+			if ( $userDomain !== $remoteDomain ) {
+				throw new MWException( "Username didn't have the right domain. "
+					. "Got '$userDomain', wanted '$remoteDomain'\n" );
 			}
 			$username = $name;
 		}

@@ -27,7 +27,9 @@
 	"config": {
 		"ExtensionFunctions": [
 			"PluggableSSO\\Hooks::initExtension"
-		]
+		],
+		"SSOHeader": "REMOTE_USER",
+		"AuthRemoteuserDomain": "example.wiki"
 	},
 	"manifest_version": 1
 }
