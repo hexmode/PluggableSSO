@@ -75,12 +75,17 @@ class PluggableSSO extends PluggableAuth {
 		$domain = null;
 		$remoteDomain = $this->getConfig( 'AuthRemoteuserDomain' );
 		if ( $remoteDomain ) {
-			list( $name, $userDomain ) = explode( '@', $username );
+			$bits = explode( '@', $username );
+			if ( count( $bits ) !== 2 ) {
+				throw new MWException( "Couldn't get username and domain "
+					. "from $username" );
+			}
+			$username = $bits[0];
+			$userDomain = $bits[1];
 			if ( $userDomain !== $remoteDomain ) {
 				throw new MWException( "Username didn't have the right domain. "
 					. "Got '$userDomain', wanted '$remoteDomain'\n" );
 			}
-			$username = $name;
 		}
 
 		$identity = \User::idFromName( "$username" );
