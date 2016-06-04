@@ -23,32 +23,31 @@
 
 class PluggableSSO extends PluggableAuth {
 
-	protected $context = null;
-	protected $config = null;
-	protected $request = null;
-	protected $headers = null;
+	static public function getUsername() {
+		$conf = RequestContext::getMain()->getConfig();
+		$headerName = $conf->get( 'SSOHeader' );
+		$remoteDomain = $conf->get( 'AuthRemoteuserDomain' );
+		$username = $conf->get( 'Request' )->getHeader( $headerName );
 
-	protected function init() {
-		if ( $this->context === null ) {
-			$this->context = RequestContext::getMain();
+		if ( !$username ) {
+			wfDebugLog( __CLASS__, "The webserver should set $headerName." );
+			return false;
 		}
-		if ( $this->config === null ) {
-			$this->config = $this->context->getConfig();
-		}
-		if ( $this->request === null ) {
-			$this->request = $this->config->get( 'Request' );
-		}
-		if ( $this->headers === null ) {
-			$this->headers = $this->request->getAllHeaders();
-		}
-	}
 
-	public function getConfig( $name ) {
-		$this->init();
-		if ( $this->config->has( $name ) ) {
-			return $this->config->get( $name );
+		if ( $remoteDomain ) {
+			$bits = explode( '@', $username );
+			if ( count( $bits ) !== 2 ) {
+				throw new MWException( "Couldn't get username and domain "
+					. "from $username" );
+			}
+			$username = $bits[0];
+			$userDomain = $bits[1];
+			if ( $userDomain !== $remoteDomain ) {
+				throw new MWException( "Username didn't have the right domain. "
+					. "Got '$userDomain', wanted '$remoteDomain'\n" );
+			}
 		}
-		return null;
+		return $username;
 	}
 
 	/**
@@ -65,29 +64,9 @@ class PluggableSSO extends PluggableAuth {
 	public function authenticate(
 		&$identity, &$username, &$realname, &$email
 	) {
-		$this->init();
-		$headerName = $this->config->get( 'SSOHeader' );
-		if ( !isset( $this->headers[ $headerName ] ) ) {
-			wfDebugLog( __CLASS__, "The webserver should set $headerName." );
-			return false;
-		}
-		$username = $this->headers[ $headerName ];
-		$domain = null;
-		$remoteDomain = $this->getConfig( 'AuthRemoteuserDomain' );
-		if ( $remoteDomain ) {
-			$bits = explode( '@', $username );
-			if ( count( $bits ) !== 2 ) {
-				throw new MWException( "Couldn't get username and domain "
-					. "from $username" );
-			}
-			$username = $bits[0];
-			$userDomain = $bits[1];
-			if ( $userDomain !== $remoteDomain ) {
-				throw new MWException( "Username didn't have the right domain. "
-					. "Got '$userDomain', wanted '$remoteDomain'\n" );
-			}
-		}
+		$username = self::getUsername();
 
+		\Hooks::run( 'PluggableSSOSetUserName', [ &$username ] );
 		$identity = \User::idFromName( "$username" );
 
 		$session_variable = wfWikiID() . "_userid";
@@ -99,8 +78,8 @@ class PluggableSSO extends PluggableAuth {
 			return false;
 		}
 
-		\Hooks::run( 'PluggableSSORealName', array( $realname ) );
-		\Hooks::run( 'PluggableSSOEmail', array( $email ) );
+		\Hooks::run( 'PluggableSSORealName', array( &$realname ) );
+		\Hooks::run( 'PluggableSSOEmail', array( &$email ) );
 		$_SESSION[$session_variable] = $identity;
 		return true;
 	}
