@@ -23,72 +23,77 @@
 
 class PluggableSSO extends PluggableAuth {
 
-	/**
-	 * @since 1.0
-	 *
-	 * @param &$id
-	 * @param &$username
-	 * @param &$realname
-	 * @param &$email
-	 *
-	 * @SuppressWarnings("CamelCaseVariableName")
-	 * @SuppressWarnings("SuperGlobals")
-	 */
-	public function authenticate(
-		&$identity, &$username, &$realname, &$email
-	) {
-		if ( !isset( $_SERVER['REMOTE_USER'] ) ) {
-			wfDebugLog( __CLASS__, "The webserver should set REMOTE_USER." );
-			return false;
-		}
-		$username = $_SERVER['REMOTE_USER'];
-		$domain = null;
-		if ( isset( $GLOBALS['wgAuthRemoteuserDomain'] ) ) {
-			$domain = $GLOBALS['wgAuthRemoteuserDomain'];
+    /**
+     * @since 1.0
+     *
+     * @param &$id
+     * @param &$username
+     * @param &$realname
+     * @param &$email
+     *
+     * @SuppressWarnings("CamelCaseVariableName")
+     * @SuppressWarnings("SuperGlobals")
+     */
+    public function authenticate(
+        &$identity, &$username, &$realname, &$email
+    ) {
+        wfDebug( __METHOD__ );
+        if ( !isset( $_SERVER['REMOTE_USER'] ) ) {
+            wfDebugLog( __CLASS__, "The webserver should set REMOTE_USER." );
+            return false;
+        }
+        $username = $_SERVER['REMOTE_USER'];
+        $domain = null;
+        if ( isset( $GLOBALS['wgAuthRemoteuserDomain'] ) ) {
+            $domain = $GLOBALS['wgAuthRemoteuserDomain'];
 
-			list( $name, $userDomain ) = explode( '@', $username );
-			if ( $userDomain !== $domain ) {
-				wfDebugLog( __CLASS__, "Username didn't have the " .
-					"right domain" );
-			}
-			$username = $name;
-		}
+            list( $name, $userDomain ) = explode( '@', $username );
+            if ( $userDomain !== $domain ) {
+                wfDebugLog( __CLASS__, "Username didn't have the " .
+                            "right domain" );
+                return false;
+            }
+            $username = $name;
+        }
 
-		$identity = \User::idFromName( "$username" );
+        if ( \Hooks::run( 'PluggableSSONotAnonymous', [ $username ] ) ) {
+            $identity = \User::idFromName( "$username" );
 
-		$session_variable = wfWikiID() . "_userid";
-		if (
-			isset( $_SESSION[$session_variable] ) &&
-			$identity != $_SESSION[$session_variable]
-		) {
-			wfDebugLog( __CLASS__, "Username didn't match session" );
-			return false;
-		}
+            $session_variable = wfWikiID() . "_userid";
+            if (
+                isset( $_SESSION[$session_variable] ) &&
+                $identity != $_SESSION[$session_variable]
+            ) {
+                wfDebugLog( __CLASS__, "Username didn't match session" );
+                return false;
+            }
 
-		\Hooks::run( 'PluggableSSORealName', array( $realname ) );
-		\Hooks::run( 'PluggableSSOEmail', array( $email ) );
-		$_SESSION[$session_variable] = $identity;
-		return true;
-	}
+            \Hooks::run( 'PluggableSSORealName', array( $realname ) );
+            \Hooks::run( 'PluggableSSOEmail', array( $email ) );
+            $_SESSION[$session_variable] = $identity;
+            return true;
+        }
+        return false;
+    }
 
-	/**
-	 * @param User &$user
-	 *
-	 * @SuppressWarnings("UnusedFormalParameter")
-	 */
-	public function deauthenticate( User &$user ) {
-		wfDebugLog( __CLASS__, "Don't know what to do with this." .
-			__METHOD__ );
-		return false;
-	}
+    /**
+     * @param User &$user
+     *
+     * @SuppressWarnings("UnusedFormalParameter")
+     */
+    public function deauthenticate( User &$user ) {
+        wfDebugLog( __CLASS__, "Don't know what to do with this." .
+                    __METHOD__ );
+        return false;
+    }
 
-	/**
-	 *
-	 * @SuppressWarnings("UnusedFormalParameter")
-	 */
-	public function saveExtraAttributes( $identity ) {
-		wfDebugLog( __CLASS__, "Don't know what to do with this: " .
-			__METHOD__ );
-		return false;
-	}
+    /**
+     *
+     * @SuppressWarnings("UnusedFormalParameter")
+     */
+    public function saveExtraAttributes( $identity ) {
+        wfDebugLog( __CLASS__, "Don't know what to do with this: " .
+                    __METHOD__ );
+        return false;
+    }
 }

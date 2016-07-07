@@ -25,24 +25,26 @@ namespace PluggableSSO;
 
 class Hooks {
 
-	/**
-	 * Hook to set up the extension.
-	 *
-	 * @SuppressWarnings("CamelCaseVariableName")
-	 * @SuppressWarnings("SuperGlobals")
-	 */
-	public static function onAuthPluginSetup( &$wgAuth ) {
-		\Hooks::run( 'PluggableSSOAuth', array( &$wgAuth ) );
-	}
+    /**
+     * Hook to set up the extension.
+     *
+     * @SuppressWarnings("CamelCaseVariableName")
+     * @SuppressWarnings("SuperGlobals")
+     */
+    public static function onAuthPluginSetup( &$wgAuth ) {
+        wfDebug( __METHOD__ );
+        \Hooks::run( 'PluggableSSOAuth', array( &$wgAuth ) );
+    }
 
-	public static function initExtension() {
-		if ( array_key_exists( 'PluggableAuth_Class', $GLOBALS ) ) {
-			throw new MWException( '<b>Error:</b> A value for ' .
-				'$PluggableAuth_Class has already been set.' );
-		}
+    public static function initExtension() {
+        wfDebug( __METHOD__ );
+        if ( array_key_exists( 'PluggableAuth_Class', $GLOBALS ) ) {
+            throw new MWException( '<b>Error:</b> A value for ' .
+                                   '$PluggableAuth_Class has already been set.' );
+        }
 
-		$GLOBALS['PluggableAuth_Class'] = 'PluggableSSO';
-		$GLOBALS['PluggableAuth_Timeout'] = 0;
-		$GLOBALS['PluggableAuth_AutoLogin'] = true;
-	}
+        $GLOBALS['PluggableAuth_Class'] = 'PluggableSSO';
+        $GLOBALS['PluggableAuth_Timeout'] = 0;
+        $GLOBALS['PluggableAuth_AutoLogin'] = true;
+    }
 }
