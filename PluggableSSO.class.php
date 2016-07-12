@@ -27,6 +27,8 @@ class PluggableSSO extends PluggableAuth {
 		$conf = RequestContext::getMain()->getConfig();
 		$headerName = $conf->get( 'SSOHeader' );
 		$remoteDomain = $conf->get( 'AuthRemoteuserDomain' );
+		$remoteDomains = array_flip( array_merge( [ $remoteDomain ],
+												  $conf->get( 'AuthRemoteuserDomains' ) ) );
 		$username = $conf->get( 'Request' )->getHeader( $headerName );
 
 		if ( !$username ) {
@@ -34,7 +36,7 @@ class PluggableSSO extends PluggableAuth {
 			return false;
 		}
 
-		if ( $remoteDomain ) {
+		if ( $remoteDomains ) {
 			$bits = explode( '@', $username );
 			if ( count( $bits ) !== 2 ) {
 				throw new MWException( "Couldn't get username and domain "
@@ -42,9 +44,14 @@ class PluggableSSO extends PluggableAuth {
 			}
 			$username = $bits[0];
 			$userDomain = $bits[1];
-			if ( $userDomain !== $remoteDomain ) {
+			if ( isset( $userDomain ) && !isset( $remoteDomains[$userDomain] ) ) {
 				throw new MWException( "Username didn't have the right domain. "
-					. "Got '$userDomain', wanted '$remoteDomain'\n" );
+									   . "Got '$userDomain', wanted one of '"
+									   . implode( ", ", $remoteDomains )
+									   . "'." );
+			}
+			if ( isset( $remoteDomains[$userDomain] ) && $userDomain !== $remoteDomain ) {
+				$username = "$username@$userDomain";
 			}
 		}
 		return $username;
