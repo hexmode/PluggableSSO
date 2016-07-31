@@ -152,7 +152,7 @@ class Auth extends \AuthPlugin {
 	 * @param $autocreate bool	// true if this is the autocration
 	 */
 	public function initUser( &$user, $autocreate = false ) {
-		Hooks::run( "PluggableSSOInitOrUpdateUser", [ &$user, $autocreate ] );
+		\Hooks::run( "PluggableSSOInitOrUpdateUser", [ &$user, $autocreate ] );
 	}
 
 	/**
