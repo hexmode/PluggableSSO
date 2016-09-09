@@ -38,12 +38,13 @@ class Hooks {
 
     public static function initExtension() {
         wfDebug( __METHOD__ );
-        if ( array_key_exists( 'PluggableAuth_Class', $GLOBALS ) ) {
+        if ( array_key_exists( 'PluggableAuth_Class', $GLOBALS ) ||
+             array_key_exists( 'wgPluggableAuth_Class', $GLOBALS ) ) {
             throw new MWException( '<b>Error:</b> A value for ' .
-                                   '$PluggableAuth_Class has already been set.' );
+                                   'PluggableAuth_Class has already been set.' );
         }
 
-        $GLOBALS['PluggableAuth_Class'] = 'PluggableSSO';
+        $GLOBALS['wgPluggableAuth_Class'] = 'PluggableSSO';
         $GLOBALS['PluggableAuth_Timeout'] = 0;
         $GLOBALS['PluggableAuth_AutoLogin'] = true;
     }
