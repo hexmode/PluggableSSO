@@ -36,12 +36,12 @@ class Hooks {
 	}
 
 	public static function initExtension() {
-		if ( array_key_exists( 'PluggableAuth_Class', $GLOBALS ) ) {
+		if ( array_key_exists( 'wgPluggableAuth_Class', $GLOBALS ) ) {
 			return;
 		}
 		wfDebugLog( __METHOD__, "initializing" );
-		$GLOBALS['PluggableAuth_Class'] = 'PluggableSSO';
-		$GLOBALS['PluggableAuth_Timeout'] = 0;
-		$GLOBALS['PluggableAuth_AutoLogin'] = true;
+		$GLOBALS['wgPluggableAuth_Class'] = 'PluggableSSO';
+		$GLOBALS['wgPluggableAuth_Timeout'] = 0;
+		$GLOBALS['wgPluggableAuth_AutoLogin'] = true;
 	}
 }
