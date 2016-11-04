@@ -42,6 +42,6 @@ class Hooks {
 		wfDebugLog( __METHOD__, "initializing" );
 		$GLOBALS['wgPluggableAuth_Class'] = 'PluggableSSO';
 		$GLOBALS['wgPluggableAuth_Timeout'] = 0;
-		$GLOBALS['wgPluggableAuth_AutoLogin'] = true;
+		$GLOBALS['wgPluggableAuth_EnableAutoLogin'] = true;
 	}
 }
