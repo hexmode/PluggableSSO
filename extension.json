@@ -24,10 +24,10 @@
 		"PluggableSSO\\Hooks": "PluggableSSO.hooks.php",
 		"PluggableSSO\\Auth":  "PluggableSSOAuth.php"
 	},
+	"ExtensionFunctions": [
+		"PluggableSSO\\Hooks::initExtension"
+	],
 	"config": {
-		"ExtensionFunctions": [
-			"PluggableSSO\\Hooks::initExtension"
-		],
 		"SSOHeader": "REMOTE_USER",
 		"AuthRemoteuserDomain": "example.wiki"
 	},
