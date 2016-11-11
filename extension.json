@@ -16,17 +16,17 @@
 	},
 	"Hooks": {
 		"AuthPluginSetup": [
-			"PluggableSSO\\Hooks::onAuthPluginSetup"
+			"PluggableSSO\\SSOHooks::onAuthPluginSetup"
 		]
 	},
 	"AutoloadClasses": {
-		"PluggableSSO": "PluggableSSO.class.php",
-		"PluggableSSO\\Hooks": "PluggableSSO.hooks.php",
+		"PluggableSSO\\PluggableSSO": "PluggableSSO.class.php",
+		"PluggableSSO\\SSOHooks": "PluggableSSO.hooks.php",
 		"PluggableSSO\\Auth":  "PluggableSSOAuth.php"
 	},
 	"config": {
 		"ExtensionFunctions": [
-			"PluggableSSO\\Hooks::initExtension"
+			"PluggableSSO\\SSOHooks::initExtension"
 		],
 		"SSOHeader": "REMOTE_USER",
 		"AuthRemoteuserDomain": "example.wiki"

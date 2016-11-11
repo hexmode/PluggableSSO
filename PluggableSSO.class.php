@@ -20,6 +20,12 @@
  *  <http://www.gnu.org/licenses/>.
  */
 
+namespace PluggableSSO;
+
+use Hooks;
+use User;
+use PluggableAuth;
+use RequestContext;
 
 class PluggableSSO extends PluggableAuth {
 
@@ -73,8 +79,8 @@ class PluggableSSO extends PluggableAuth {
 	) {
 		$username = self::getUsername();
 
-		\Hooks::run( 'PluggableSSOSetUserName', [ &$username ] );
-		$identity = \User::idFromName( "$username" );
+		Hooks::run( 'PluggableSSOSetUserName', [ &$username ] );
+		$identity = User::idFromName( "$username" );
 
 		$session_variable = wfWikiID() . "_userid";
 		if (
@@ -85,8 +91,9 @@ class PluggableSSO extends PluggableAuth {
 			return false;
 		}
 
-		\Hooks::run( 'PluggableSSORealName', array( &$realname ) );
-		\Hooks::run( 'PluggableSSOEmail', array( &$email ) );
+		Hooks::run( 'PluggableSSORealName', array( &$realname ) );
+		Hooks::run( 'PluggableSSOEmail', array( &$email ) );
+
 		$_SESSION[$session_variable] = $identity;
 		return true;
 	}

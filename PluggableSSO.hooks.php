@@ -23,7 +23,9 @@
 
 namespace PluggableSSO;
 
-class Hooks {
+use Hooks;
+
+class SSOHooks {
 
 	/**
 	 * Hook to set up the extension.
@@ -32,7 +34,7 @@ class Hooks {
 	 * @SuppressWarnings("SuperGlobals")
 	 */
 	public static function onAuthPluginSetup( $wgAuth ) {
-		\Hooks::run( 'PluggableSSOAuth', array( &$wgAuth ) );
+        Hooks::run( 'PluggableSSOAuth', array( &$wgAuth ) );
 	}
 
 	public static function initExtension() {
@@ -40,7 +42,7 @@ class Hooks {
 			return;
 		}
 		wfDebugLog( __METHOD__, "initializing" );
-		$GLOBALS['PluggableAuth_Class'] = 'PluggableSSO';
+		$GLOBALS['PluggableAuth_Class'] = 'PluggableSSO\PluggableSSO';
 		$GLOBALS['PluggableAuth_Timeout'] = 0;
 		$GLOBALS['PluggableAuth_AutoLogin'] = true;
 	}
