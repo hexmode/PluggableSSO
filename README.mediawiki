@@ -15,3 +15,14 @@ This extension can also replace the [https://www.mediawiki.org/wiki/Extension:Si
 $wgSSOHeader = "SM-MAIL";
 $wgAuthRemoteuserDomain = "example.com";
 ```
+
+=== Configuration parameters ===
+ Flag                      |  Default value             | Description
+---------------------------|----------------------------|------------------------------
+ $wgAuthRemoteuserDomains  | '''''no default value''''' | Array of allowed names for the domain part of the remote user header (gets merge with $wgAuthRemoteuserDomain).
+ $wgAuthRemoteuserDomain   | '''''no default value''''' | Allowed name for the domain part of the remote user header (gets merged with $wgAuthRemoteuserDomains).
+ $wgSSOHeader              | '''''no default value''''' | The name of the webserver header in which the username is available in the form ''username@domain'' (manadatory).
+ $wgSSOEmailHeader         | '''''no default value''''' | The name of the webserver header in which the user's email is available (optional).
+ $wgSSORealNameHeader      | '''''no default value''''' | The name of the webserver header in which the user's real name is available (optional).
+
+
