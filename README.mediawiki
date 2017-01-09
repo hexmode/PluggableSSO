@@ -32,7 +32,7 @@ $wgAuthRemoteuserDomain = "example.com";
 |-
 | $wgSSOHeader              
 | ''no default value'' 
-| The name of the webserver header in which the username is available in the form ''username@domain'' ('''manadatory'''). 
+| The name of the webserver header in which the username is available in the form ''username@domain'' ('''mandatory'''). 
 |-
 | $wgSSOEmailHeader         
 | ''no default value'' 
