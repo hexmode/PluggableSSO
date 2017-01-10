@@ -54,7 +54,7 @@ class PluggableSSO extends PluggableAuth {
 				$username = "$username@$userDomain";
 			}
 		}
-		return $username;
+		return ucfirst( $username );
 	}
 
 	/**
