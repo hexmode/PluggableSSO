@@ -54,7 +54,28 @@ class PluggableSSO extends PluggableAuth {
 				$username = "$username@$userDomain";
 			}
 		}
-		return $username;
+		return ucfirst( $username );
+	}
+
+	/**
+	 * get email address and real name from HTTP headers if 
+	 * $wgSSOEmailHeader and/or $wgSSORealNameHeader are configured 
+	 */
+	private function getEmailAndRealName() {
+		$email = $realname = "";
+		$conf = RequestContext::getMain()->getConfig();
+
+		if ( $conf->has( 'SSOEmailHeader' ) ) {
+			$emailHeaderName = $conf->get( 'SSOEmailHeader' );
+			$email = $conf->get( 'Request' )->getHeader( $emailHeaderName );
+		}
+
+		if ( $conf->has( 'SSORealNameHeader' ) ) {
+			$realnameHeaderName = $conf->get( 'SSORealNameHeader' );
+			$realname = $conf->get( 'Request' )->getHeader( $realnameHeaderName );
+		}
+
+		return array($email, $realname);
 	}
 
 	/**
@@ -85,6 +106,7 @@ class PluggableSSO extends PluggableAuth {
 			return false;
 		}
 
+		list ($email, $realname) = $this->getEmailAndRealName();
 		\Hooks::run( 'PluggableSSORealName', array( &$realname ) );
 		\Hooks::run( 'PluggableSSOEmail', array( &$email ) );
 		$_SESSION[$session_variable] = $identity;
