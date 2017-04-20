@@ -11,7 +11,7 @@ This extension is meant to be a drop-in replacement for that.
 
 This extension can also replace the [https://www.mediawiki.org/wiki/Extension:Siteminder_Authentication Siteminder Authentication] extension with a couple of lines of code:
 
-``` php
+<syntaxhighlight lang="php">
 $wgSSOHeader = "SM-MAIL";
 $wgAuthRemoteuserDomain = "example.com";
-```
+</syntaxhighlight>
