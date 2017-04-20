@@ -25,16 +25,17 @@ namespace PluggableSSO;
 
 class Hooks {
 
-	/**
-	 * Hook to set up the extension.
-	 *
-	 * @SuppressWarnings("CamelCaseVariableName")
-	 * @SuppressWarnings("SuperGlobals")
-	 */
-	public static function onAuthPluginSetup( $wgAuth ) {
-		\Hooks::run( 'PluggableSSOAuth', array( &$wgAuth ) );
-	}
+    public static function onAuthPluginSetup( &$wgAuth ) {
+        wfDebug( __METHOD__ );
+        \Hooks::run( 'PluggableSSOAuth', array( &$wgAuth ) );
+    }
 
+    /**
+     * Hook to set up the extension.
+     *
+     * @SuppressWarnings("CamelCaseVariableName")
+     * @SuppressWarnings("SuperGlobals")
+     */
 	public static function initExtension() {
 		$extensionData = \ExtensionRegistry::getInstance()->getAllThings();
 		$prefix = '';
@@ -42,13 +43,13 @@ class Hooks {
 		if ( isset( $extensionData['PluggableAuth'] ) ) {
 			$pluggablAuthVersion = $extensionData['PluggableAuth']['version'];
 			if ( version_compare( $pluggablAuthVersion, '2.0', '>=' ) ) {
-				// PluggableAuth 2.0 prefixed config Variables with 'wg' 
+				// PluggableAuth 2.0 prefixed config Variables with 'wg'
 				// and renamed '...AutoLogin' to '...EnableAutoLogin'
 				$prefix = 'wg';
 				$configAutoLogin = 'PluggableAuth_EnableAutoLogin';
 			}
 		}
-			
+
 		if ( array_key_exists( $prefix . 'PluggableAuth_Class', $GLOBALS ) ) {
 			return;
 		}

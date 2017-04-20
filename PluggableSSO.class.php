@@ -40,7 +40,7 @@ class PluggableSSO extends PluggableAuth {
 			$bits = explode( '@', $username );
 			if ( count( $bits ) !== 2 ) {
 				throw new MWException( "Couldn't get username and domain "
-					. "from $username" );
+                                       . "from $username" );
 			}
 			$username = $bits[0];
 			$userDomain = $bits[1];
@@ -76,14 +76,14 @@ class PluggableSSO extends PluggableAuth {
 		\Hooks::run( 'PluggableSSOSetUserName', [ &$username ] );
 		$identity = \User::idFromName( "$username" );
 
-		$session_variable = wfWikiID() . "_userid";
-		if (
-			isset( $_SESSION[$session_variable] ) &&
-			$identity != $_SESSION[$session_variable]
-		) {
-			wfDebugLog( __CLASS__, "Username didn't match session" );
-			return false;
-		}
+        $session_variable = wfWikiID() . "_userid";
+        if (
+            isset( $_SESSION[$session_variable] ) &&
+            $identity != $_SESSION[$session_variable]
+        ) {
+            wfDebugLog( __CLASS__, "Username didn't match session" );
+            return false;
+        }
 
 		\Hooks::run( 'PluggableSSORealName', array( &$realname ) );
 		\Hooks::run( 'PluggableSSOEmail', array( &$email ) );
@@ -91,24 +91,24 @@ class PluggableSSO extends PluggableAuth {
 		return true;
 	}
 
-	/**
-	 * @param User &$user
-	 *
-	 * @SuppressWarnings("UnusedFormalParameter")
-	 */
-	public function deauthenticate( User &$user ) {
-		wfDebugLog( __CLASS__, "Don't know what to do with this." .
-			__METHOD__ );
-		return false;
-	}
+    /**
+     * @param User &$user
+     *
+     * @SuppressWarnings("UnusedFormalParameter")
+     */
+    public function deauthenticate( User &$user ) {
+        wfDebugLog( __CLASS__, "Don't know what to do with this." .
+                    __METHOD__ );
+        return false;
+    }
 
-	/**
-	 *
-	 * @SuppressWarnings("UnusedFormalParameter")
-	 */
-	public function saveExtraAttributes( $identity ) {
-		wfDebugLog( __CLASS__, "Don't know what to do with this: " .
-			__METHOD__ );
-		return false;
-	}
+    /**
+     *
+     * @SuppressWarnings("UnusedFormalParameter")
+     */
+    public function saveExtraAttributes( $identity ) {
+        wfDebugLog( __CLASS__, "Don't know what to do with this: " .
+                    __METHOD__ );
+        return false;
+    }
 }
