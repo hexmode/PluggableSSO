@@ -20,30 +20,25 @@
  *  <http://www.gnu.org/licenses/>.
  */
 
-
 namespace PluggableSSO;
 
 use Hooks;
 
-class SSOHooks {
+class Hook {
 
 	/**
-	 * Hook to set up the extension.
-	 *
-	 * @SuppressWarnings("CamelCaseVariableName")
-	 * @SuppressWarnings("SuperGlobals")
+	 * Extension initialization
+	 * @return null
+	 * @SuppressWarnings(CamelCaseVariableName)
+	 * @SuppressWarnings(LongVariable)
 	 */
-	public static function onAuthPluginSetup( $wgAuth ) {
-        Hooks::run( 'PluggableSSOAuth', array( &$wgAuth ) );
-	}
-
 	public static function initExtension() {
-		if ( array_key_exists( 'PluggableAuth_Class', $GLOBALS ) ) {
+		global $wgPluggableAuth_Class, $wgPluggableAuth_EnableAutoLogin;
+		if ( isset( $wgPluggableAuth_Class ) ) {
 			return;
 		}
 		wfDebugLog( __METHOD__, "initializing" );
-		$GLOBALS['PluggableAuth_Class'] = 'PluggableSSO\PluggableSSO';
-		$GLOBALS['PluggableAuth_Timeout'] = 0;
-		$GLOBALS['PluggableAuth_AutoLogin'] = true;
+		$wgPluggableAuth_Class = 'PluggableSSO\PluggableSSO';
+		$wgPluggableAuth_EnableAutoLogin = true;
 	}
 }

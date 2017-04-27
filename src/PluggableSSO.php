@@ -29,13 +29,23 @@ use RequestContext;
 
 class PluggableSSO extends PluggableAuth {
 
-	static public function getUsername() {
+	/**
+	 * Utility method to determine the username from the
+	 * headers. Users can also hook into PluggableSSOSetUserName if
+	 * they need to override or augment the username method.
+	 * @return string|boolean false if username couldn't be
+	 *     determined, string otherwise
+	 */
+	public function getUsername() {
 		$conf = RequestContext::getMain()->getConfig();
 		$headerName = $conf->get( 'SSOHeader' );
 		$remoteDomain = $conf->get( 'AuthRemoteuserDomain' );
-		$remoteDomains = array_flip( array_merge( [ $remoteDomain ],
-												  $conf->get( 'AuthRemoteuserDomains' ) ) );
+		$remoteDomains = array_flip
+					   ( array_merge( [ $remoteDomain ],
+									  $conf->get( 'AuthRemoteuserDomains' )
+					   ) );
 		$username = $conf->get( 'Request' )->getHeader( $headerName );
+		Hooks::run( 'PluggableSSOSetUserName', [ &$username ] );
 
 		if ( !$username ) {
 			wfDebugLog( __CLASS__, "The webserver should set $headerName." );
@@ -50,13 +60,15 @@ class PluggableSSO extends PluggableAuth {
 			}
 			$username = $bits[0];
 			$userDomain = $bits[1];
-			if ( isset( $userDomain ) && !isset( $remoteDomains[$userDomain] ) ) {
+			if ( isset( $userDomain )
+				 && !isset( $remoteDomains[$userDomain] ) ) {
 				throw new MWException( "Username didn't have the right domain. "
 									   . "Got '$userDomain', wanted one of '"
 									   . implode( ", ", $remoteDomains )
 									   . "'." );
 			}
-			if ( isset( $remoteDomains[$userDomain] ) && $userDomain !== $remoteDomain ) {
+			if ( isset( $remoteDomains[$userDomain] )
+				 && $userDomain !== $remoteDomain ) {
 				$username = "$username@$userDomain";
 			}
 		}
@@ -66,10 +78,12 @@ class PluggableSSO extends PluggableAuth {
 	/**
 	 * @since 1.0
 	 *
-	 * @param &$id
-	 * @param &$username
-	 * @param &$realname
-	 * @param &$email
+	 * @param int &$identity ID of user, leave null if new user
+	 * @param string &$username username
+	 * @param string &$realname real name of user
+	 * @param string &$email email address of user
+	 * @return boolean false if the username matches what is in the
+	 *     session
 	 *
 	 * @SuppressWarnings("CamelCaseVariableName")
 	 * @SuppressWarnings("SuperGlobals")
@@ -77,9 +91,8 @@ class PluggableSSO extends PluggableAuth {
 	public function authenticate(
 		&$identity, &$username, &$realname, &$email
 	) {
-		$username = self::getUsername();
+		$username = $this->getUsername();
 
-		Hooks::run( 'PluggableSSOSetUserName', [ &$username ] );
 		$identity = User::idFromName( "$username" );
 
 		$session_variable = wfWikiID() . "_userid";
@@ -91,31 +104,30 @@ class PluggableSSO extends PluggableAuth {
 			return false;
 		}
 
-		Hooks::run( 'PluggableSSORealName', array( &$realname ) );
-		Hooks::run( 'PluggableSSOEmail', array( &$email ) );
+		$realname = $this->discoverRealname();
+		$email = $this->getEmail();
 
 		$_SESSION[$session_variable] = $identity;
 		return true;
 	}
 
 	/**
-	 * @param User &$user
+	 * @param User &$user user that is logging out
+	 * @return boolean
 	 *
 	 * @SuppressWarnings("UnusedFormalParameter")
 	 */
 	public function deauthenticate( User &$user ) {
-		wfDebugLog( __CLASS__, "Don't know what to do with this." .
-			__METHOD__ );
 		return false;
 	}
 
 	/**
+	 * @param int $identity user id
+	 * @return boolean
 	 *
 	 * @SuppressWarnings("UnusedFormalParameter")
 	 */
 	public function saveExtraAttributes( $identity ) {
-		wfDebugLog( __CLASS__, "Don't know what to do with this: " .
-			__METHOD__ );
 		return false;
 	}
 }
