@@ -3,7 +3,7 @@
 	"namemsg": "pluggablesso-extensionname",
 	"version": "0.1",
 	"author": [
-		"[//mwstake.org Mark A. Hershberger]"
+		"[http://mwstake.org Mark A. Hershberger]"
 	],
 	"url": "https://www.mediawiki.org/wiki/Extension:PluggableSSO",
 	"descriptionmsg": "pluggablesso-desc",
@@ -14,20 +14,14 @@
 			"i18n"
 		]
 	},
-	"Hooks": {
-		"AuthPluginSetup": [
-			"PluggableSSO\\Hooks::onAuthPluginSetup"
-		]
-	},
 	"AutoloadClasses": {
-		"PluggableSSO": "PluggableSSO.class.php",
-		"PluggableSSO\\Hooks": "PluggableSSO.hooks.php",
-		"PluggableSSO\\Auth":  "PluggableSSOAuth.php"
+		"PluggableSSO\\PluggableSSO": "src/PluggableSSO.php",
+		"PluggableSSO\\Hook": "src/Hook.php"
 	},
-	"ExtensionFunctions": [
-		"PluggableSSO\\Hooks::initExtension"
-	],
 	"config": {
+		"ExtensionFunctions": [
+			"PluggableSSO\\Hook::initExtension"
+		],
 		"SSOHeader": "REMOTE_USER",
 		"AuthRemoteuserDomain": "example.wiki"
 	},
