@@ -37,29 +37,37 @@ class PluggableSSO extends PluggableAuth {
 	 *     determined, string otherwise
 	 */
 	public function getUsername() {
-		$conf = RequestContext::getMain()->getConfig();
+		$conf = $this->getConfig();
 		$headerName = $conf->get( 'SSOHeader' );
+		$username = $conf->get( 'Request' )->getHeader( $headerName );
+		if ( !$username ) {
+			wfDebugLog( __CLASS__, "The webserver should set $headerName." );
+			return false;
+		}
+		$username = $this->checkMultiDomain( $username );
+		return $username;
+	}
+
+	protected function getConfig() {
+		return RequestContext::getMain()->getConfig();
+	}
+
+	public function checkMultiDomain( $username ) {
+		$conf = $this->getConfig();
 		$remoteDomain = $conf->get( 'AuthRemoteuserDomain' );
 		$remoteDomains = array_flip
 					   ( array_merge( [ $remoteDomain ],
 									  $conf->get( 'AuthRemoteuserDomains' )
 					   ) );
-		$username = $conf->get( 'Request' )->getHeader( $headerName );
-		Hooks::run( 'PluggableSSOSetUserName', [ &$username ] );
-
-		if ( !$username ) {
-			wfDebugLog( __CLASS__, "The webserver should set $headerName." );
-			return false;
+		$bits = explode( '@', $username );
+		if ( count( $bits ) !== 2 ) {
+			throw new MWException( "Couldn't get username and domain "
+								   . "from $username" );
 		}
+		$username = $bits[0];
+		$userDomain = $bits[1];
 
-		if ( $remoteDomains ) {
-			$bits = explode( '@', $username );
-			if ( count( $bits ) !== 2 ) {
-				throw new MWException( "Couldn't get username and domain "
-									   . "from $username" );
-			}
-			$username = $bits[0];
-			$userDomain = $bits[1];
+		if ( $userDomain !== $remoteDomain ) {
 			if ( isset( $userDomain )
 				 && !isset( $remoteDomains[$userDomain] ) ) {
 				throw new MWException( "Username didn't have the right domain. "
@@ -67,13 +75,14 @@ class PluggableSSO extends PluggableAuth {
 									   . implode( ", ", $remoteDomains )
 									   . "'." );
 			}
-			if ( isset( $remoteDomains[$userDomain] )
-				 && $userDomain !== $remoteDomain ) {
-				$username = "$username@$userDomain";
-			}
+			$username = "$username@$userDomain";
 		}
 		return $username;
 	}
+
+	abstract public function discoverRealname();
+
+	abstract public function discoverEmail();
 
 	/**
 	 * @since 1.0
@@ -82,30 +91,31 @@ class PluggableSSO extends PluggableAuth {
 	 * @param string &$username username
 	 * @param string &$realname real name of user
 	 * @param string &$email email address of user
-	 * @return boolean false if the username matches what is in the
-	 *     session
+	 * @param string &$errorMessage any error message
+	 * @return boolean false if the username does not match what is in
+	 *     the session
 	 *
 	 * @SuppressWarnings("CamelCaseVariableName")
 	 * @SuppressWarnings("SuperGlobals")
 	 */
 	public function authenticate(
-		&$identity, &$username, &$realname, &$email
+		&$identity, &$username, &$realname, &$email, &$errorMessage
 	) {
 		$username = $this->getUsername();
-
-		$identity = User::idFromName( "$username" );
+		$identity = User::idFromName( $username );
 
 		$session_variable = wfWikiID() . "_userid";
 		if (
 			isset( $_SESSION[$session_variable] ) &&
 			$identity != $_SESSION[$session_variable]
 		) {
-			wfDebugLog( __CLASS__, "Username didn't match session" );
+			$errorMessage = "Username didn't match session";
+			wfDebugLog( __CLASS__, $errorMessage );
 			return false;
 		}
 
 		$realname = $this->discoverRealname();
-		$email = $this->getEmail();
+		$email = $this->discoverEmail();
 
 		$_SESSION[$session_variable] = $identity;
 		return true;
