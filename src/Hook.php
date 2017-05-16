@@ -46,11 +46,7 @@ class Hook {
 			}
 		}
 
-		if ( array_key_exists( $prefix . 'PluggableAuth_Class', $GLOBALS ) ) {
-			return;
-		}
 		wfDebugLog( __METHOD__, "initializing" );
-		$GLOBALS[$prefix . 'PluggableAuth_Class'] = 'PluggableSSO\\PluggableSSO';
 		$GLOBALS[$prefix . 'PluggableAuth_Timeout'] = 0;
 		$GLOBALS[$prefix . $configAutoLogin] = true;
 	}

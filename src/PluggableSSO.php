@@ -23,11 +23,12 @@
 namespace PluggableSSO;
 
 use Hooks;
-use User;
+use MWException;
 use PluggableAuth;
 use RequestContext;
+use User;
 
-class PluggableSSO extends PluggableAuth {
+abstract class PluggableSSO extends PluggableAuth {
 
 	/**
 	 * Utility method to determine the username from the
@@ -91,7 +92,6 @@ class PluggableSSO extends PluggableAuth {
 	 * @param string &$username username
 	 * @param string &$realname real name of user
 	 * @param string &$email email address of user
-	 * @param string &$errorMessage any error message
 	 * @return boolean false if the username does not match what is in
 	 *     the session
 	 *
@@ -99,7 +99,7 @@ class PluggableSSO extends PluggableAuth {
 	 * @SuppressWarnings("SuperGlobals")
 	 */
 	public function authenticate(
-		&$identity, &$username, &$realname, &$email, &$errorMessage
+		&$identity, &$username, &$realname, &$email
 	) {
 		$username = $this->getUsername();
 		$identity = User::idFromName( $username );
@@ -114,8 +114,18 @@ class PluggableSSO extends PluggableAuth {
 			return false;
 		}
 
-		$realname = $this->discoverRealname();
-		$email = $this->discoverEmail();
+		$ssoRealName = $this->discoverRealname();
+		if ( $ssoRealName && $realname !== $ssoRealName ) {
+			wfDebugLog( __METHOD__, "Updating real name from '$realname' ".
+						"to '$ssoRealName'\n" );
+			$realname = $ssoRealName;
+		}
+		$ssoEmail = $this->discoverEmail();
+		if ( $ssoEmail && $email !== $ssoEmail ) {
+			wfDebugLog( __METHOD__, "Updating email from '$email' " .
+						"to '$ssoEmail'\n" );
+			$email = $ssoEmail;
+		}
 
 		$_SESSION[$session_variable] = $identity;
 		return true;
