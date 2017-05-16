@@ -25,6 +25,7 @@ namespace PluggableSSO;
 use Hooks;
 use MWException;
 use PluggableAuth;
+use PluggableAuthLogin;
 use RequestContext;
 use User;
 
@@ -72,9 +73,9 @@ abstract class PluggableSSO extends PluggableAuth {
 			if ( isset( $userDomain )
 				 && !isset( $remoteDomains[$userDomain] ) ) {
 				throw new MWException( "Username didn't have the right domain. "
-									   . "Got '$userDomain', wanted one of '"
-									   . implode( ", ", $remoteDomains )
-									   . "'." );
+									   . "Got '$userDomain', wanted one of \n* "
+									   . implode( "\n* ", array_keys( $remoteDomains ) )
+									   . "\n" );
 			}
 			$username = "$username@$userDomain";
 		}
@@ -99,12 +100,12 @@ abstract class PluggableSSO extends PluggableAuth {
 	 * @SuppressWarnings("SuperGlobals")
 	 */
 	public function authenticate(
-		&$identity, &$username, &$realname, &$email
+		&$identity, &$username, &$realname, &$email, &$errorMessage
 	) {
 		$username = $this->getUsername();
 		$identity = User::idFromName( $username );
 
-		$session_variable = wfWikiID() . "_userid";
+		$session_variable = PluggableAuthLogin::USERNAME_SESSION_KEY;
 		if (
 			isset( $_SESSION[$session_variable] ) &&
 			$identity != $_SESSION[$session_variable]
