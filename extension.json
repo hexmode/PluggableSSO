@@ -16,11 +16,21 @@
 	},
 	"AutoloadClasses": {
 		"PluggableSSO\\PluggableSSO": "src/PluggableSSO.php",
+		"PluggableSSO\\SessionProvider": "src/SessionProvider.php",
 		"PluggableSSO\\Hook": "src/Hook.php"
 	},
 	"ExtensionFunctions": [
 		"PluggableSSO\\Hook::initExtension"
 	],
+    "SessionProviders": {
+		"PluggableSSO\\SessionProvider": {
+			"class": "PluggableSSO\\SessionProvider",
+			"args": [ {
+				"priority": 50,
+				"callUserSetCookiesHook": true
+			} ]
+		}
+	},
 	"config": {
 		"SSOHeader": "REMOTE_USER",
 		"AuthRemoteuserDomain": "example.wiki"
