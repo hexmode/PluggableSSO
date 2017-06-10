@@ -22,7 +22,7 @@
 	"ExtensionFunctions": [
 		"PluggableSSO\\Hook::initExtension"
 	],
-    "SessionProviders": {
+	"SessionProviders": {
 		"PluggableSSO\\SessionProvider": {
 			"class": "PluggableSSO\\SessionProvider",
 			"args": [ {
