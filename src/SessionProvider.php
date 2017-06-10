@@ -53,7 +53,6 @@ class SessionProvider extends CookieSessionProvider {
 
 		$session = parent::provideSessionInfo( $request );
 		if ( $session === null ) {
-			# FIXME: cut 'n paste from PluggableSSO::getUsername
 			$conf = $this->getConfig();
 			$headerName = $conf->get( 'SSOHeader' );
 			$username = $request->getHeader( $headerName );
@@ -75,7 +74,6 @@ class SessionProvider extends CookieSessionProvider {
 		return $session;
 	}
 
-	// FIXME: Cut-n-paste from PluggableSSO.php
 	protected function checkMultiDomain( $username ) {
 		$conf = $this->getConfig();
 		$remoteDomain = $conf->get( 'AuthRemoteuserDomain' );

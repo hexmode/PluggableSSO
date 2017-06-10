@@ -31,55 +31,8 @@ use User;
 
 abstract class PluggableSSO extends PluggableAuth {
 
-	/**
-	 * Utility method to determine the username from the
-	 * headers. Users can also hook into PluggableSSOSetUserName if
-	 * they need to override or augment the username method.
-	 * @return string|boolean false if username couldn't be
-	 *     determined, string otherwise
-	 */
-	public function getUsername() {
-		$conf = $this->getConfig();
-		$headerName = $conf->get( 'SSOHeader' );
-		$username = $conf->get( 'Request' )->getHeader( $headerName );
-		if ( !$username ) {
-			wfDebugLog( __CLASS__, "The webserver should set $headerName." );
-			return false;
-		}
-		$username = $this->checkMultiDomain( $username );
-		return $username;
-	}
-
 	protected function getConfig() {
 		return RequestContext::getMain()->getConfig();
-	}
-
-	public function checkMultiDomain( $username ) {
-		$conf = $this->getConfig();
-		$remoteDomain = $conf->get( 'AuthRemoteuserDomain' );
-		$remoteDomains = array_flip
-					   ( array_merge( [ $remoteDomain ],
-									  $conf->get( 'AuthRemoteuserDomains' )
-					   ) );
-		$bits = explode( '@', $username );
-		if ( count( $bits ) !== 2 ) {
-			throw new MWException( "Couldn't get username and domain "
-								   . "from $username" );
-		}
-		$username = $bits[0];
-		$userDomain = $bits[1];
-
-		if ( $userDomain !== $remoteDomain ) {
-			if ( isset( $userDomain )
-				 && !isset( $remoteDomains[$userDomain] ) ) {
-				throw new MWException( "Username didn't have the right domain. "
-									   . "Got '$userDomain', wanted one of \n* "
-									   . implode( "\n* ", array_keys( $remoteDomains ) )
-									   . "\n" );
-			}
-			$username = "$username@$userDomain";
-		}
-		return $username;
 	}
 
 	abstract public function discoverRealname();
@@ -102,7 +55,10 @@ abstract class PluggableSSO extends PluggableAuth {
 	public function authenticate(
 		&$identity, &$username, &$realname, &$email, &$errorMessage
 	) {
-		$username = $this->getUsername();
+        if ( !$username ) {
+            wfDebugLog( __METHOD__, "got no username, session failed somehow." );
+            return false;
+        }
 		$identity = User::idFromName( $username );
 
 		$session_variable = PluggableAuthLogin::USERNAME_SESSION_KEY;
