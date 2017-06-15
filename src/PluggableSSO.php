@@ -61,7 +61,7 @@ abstract class PluggableSSO extends PluggableAuth {
 			$identity = User::idFromName( $username );
 		}
 		if ( !$username ) {
-			$session = MediaWiki\Session\SessionManager::getGlobalSession();
+			$session = SessionManager::getGlobalSession();
 			$user = $session->getUser();
 			if ( $user instanceof User ) {
 				$username = $user->getName();
@@ -71,16 +71,6 @@ abstract class PluggableSSO extends PluggableAuth {
 		if ( !$username ) {
 			$errorMessage = wfMessage( "pluggablesso-no-session" );
 			wfDebugLog( __METHOD__, $errorMessage );
-			return false;
-		}
-
-		$session_variable = PluggableAuthLogin::USERNAME_SESSION_KEY;
-		if (
-			isset( $_SESSION[$session_variable] ) &&
-			$identity != $_SESSION[$session_variable]
-		) {
-			$errorMessage = wfMessage( "pluggablesso-username-mismatch" );
-			wfDebugLog( __CLASS__, $errorMessage );
 			return false;
 		}
 
