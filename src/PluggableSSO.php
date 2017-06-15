@@ -46,6 +46,7 @@ abstract class PluggableSSO extends PluggableAuth {
 	 * @param string &$username username
 	 * @param string &$realname real name of user
 	 * @param string &$email email address of user
+	 * @param string &$errorMessage error message to return
 	 * @return boolean false if the username does not match what is in
 	 *     the session
 	 *
@@ -55,10 +56,11 @@ abstract class PluggableSSO extends PluggableAuth {
 	public function authenticate(
 		&$identity, &$username, &$realname, &$email, &$errorMessage
 	) {
-        if ( !$username ) {
-            wfDebugLog( __METHOD__, "got no username, session failed somehow." );
-            return false;
-        }
+		if ( !$username ) {
+			$errorMessage = "Got no username, session failed somehow.";
+			wfDebugLog( __METHOD__, $errorMessage );
+			return false;
+		}
 		$identity = User::idFromName( $username );
 
 		$session_variable = PluggableAuthLogin::USERNAME_SESSION_KEY;
