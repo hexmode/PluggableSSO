@@ -1,8 +1,11 @@
 {
 	"@metadata": {
 		"authors": [
-			"MarkAHershberger",
+			"MarkAHershberger"
 		]
 	},
-	"pluggablesso-desc": "{{desc|name=PluggableSSO|url=https://www.mediawiki.org/wiki/Extension:PluggableSSO}}"
+	"pluggablesso-desc": "{{desc|name=PluggableSSO|url=https://www.mediawiki.org/wiki/Extension:PluggableSSO}}",
+	"pluggablesso-no-session": "Message to return when we don't have a username",
+	"pluggablesso-username-mismatch": "Username we got doesn't match what was passed"
+
 }

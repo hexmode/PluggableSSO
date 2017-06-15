@@ -57,7 +57,7 @@ abstract class PluggableSSO extends PluggableAuth {
 		&$identity, &$username, &$realname, &$email, &$errorMessage
 	) {
 		if ( !$username ) {
-			$errorMessage = "Got no username, session failed somehow.";
+			$errorMessage = wfMessage( "pluggablesso-no-session" );
 			wfDebugLog( __METHOD__, $errorMessage );
 			return false;
 		}
@@ -68,7 +68,7 @@ abstract class PluggableSSO extends PluggableAuth {
 			isset( $_SESSION[$session_variable] ) &&
 			$identity != $_SESSION[$session_variable]
 		) {
-			$errorMessage = "Username didn't match session";
+			$errorMessage = wfMessage( "pluggablesso-username-mismatch" );
 			wfDebugLog( __CLASS__, $errorMessage );
 			return false;
 		}
