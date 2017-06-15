@@ -43,15 +43,15 @@ class SessionProvider extends CookieSessionProvider {
 	 * @return SessionInfo|null
 	 */
 	public function provideSessionInfo( WebRequest $request ) {
+		$session = parent::provideSessionInfo( $request );
 		if ( defined( 'MW_NO_SESSION' ) ) {
 			wfDebugLog(
 				__METHOD__,
 				"No session for request: " . $_SERVER['REQUEST_URI']
 			);
-			return null;
+			return $session;
 		}
 
-		$session = parent::provideSessionInfo( $request );
 		if ( $session === null ) {
 			$conf = $this->getConfig();
 			$headerName = $conf->get( 'SSOHeader' );
