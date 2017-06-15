@@ -25,6 +25,7 @@ namespace PluggableSSO;
 use Hooks;
 use MWException;
 use PluggableAuth;
+use MediaWiki\Session\SessionManager;
 use PluggableAuthLogin;
 use RequestContext;
 use User;
@@ -56,12 +57,22 @@ abstract class PluggableSSO extends PluggableAuth {
 	public function authenticate(
 		&$identity, &$username, &$realname, &$email, &$errorMessage
 	) {
+		if ( $identity === null && $username ) {
+			$identity = User::idFromName( $username );
+		}
+		if ( !$username ) {
+			$session = MediaWiki\Session\SessionManager::getGlobalSession();
+			$user = $session->getUser();
+			if ( $user instanceof User ) {
+				$username = $user->getName();
+				$identity = $user->getID();
+			}
+		}
 		if ( !$username ) {
 			$errorMessage = wfMessage( "pluggablesso-no-session" );
 			wfDebugLog( __METHOD__, $errorMessage );
 			return false;
 		}
-		$identity = User::idFromName( $username );
 
 		$session_variable = PluggableAuthLogin::USERNAME_SESSION_KEY;
 		if (
